@@ -1,5 +1,7 @@
 # SpringBootOData
 
+[![Maven Build](https://github.com/denisw160/SpringBootOData/actions/workflows/maven.yml/badge.svg)](https://github.com/denisw160/SpringBootOData/actions/workflows/maven.yml)
+
 This demo project shows you the implementation of ODATA in Spring Boot with Spring Data (JPA) and Spring Security.
 
 ## Build
