@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" th:fragment="layout(title,content)" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Title-->
+    <title th:replace="${title}">Spring Boot ODATA Demo</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/resources/images/favicon.ico}">
+
+    <!-- Activate live reload -->
+    <!--suppress JSUnresolvedLibraryURL -->
+    <script src="http://localhost:35729/livereload.js"></script>
+
+    <!-- Jquery, Bootstrap and Fontawesome -->
+    <script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/5.0.1/js/bootstrap.bundle.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/5.15.2/css/all.min.css}">
+
+    <!-- Include custom javascript and style -->
+    <script th:src="@{/resources/js/application.js}"></script>
+    <link rel="stylesheet" th:href="@{/resources/css/style.css}">
+</head>
+<body>
+
+<!-- Main content -->
+<main>
+    <!-- Header / Navbar -->
+    <header>
+        <div th:replace="fragments/header :: header">&nbsp;</div>
+    </header>
+
+    <!-- Content -->
+    <div class="container mx-auto p-3 py-md-3">
+        <div th:replace="${content}">
+            <!-- =================================================================================== -->
+            <!-- This content is only used for static prototyping purposes (natural templates)       -->
+            <!-- and is therefore entirely optional, as this markup fragment will be included        -->
+            <!-- from "fragments/header.html" and "fragments/footer.html" at runtime.                -->
+            <!-- =================================================================================== -->
+            <!-- See https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#template-layout -->
+
+            <h1>Static content for prototyping purposes only</h1>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent scelerisque neque neque, ac elementum
+                quam dignissim interdum. Phasellus et placerat elit. Lorem ipsum dolor sit amet, consectetur adipiscing
+                elit. Praesent scelerisque neque neque, ac elementum quam dignissim interdum. Phasellus et placerat
+                elit.
+            </p>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer>
+    <div th:replace="fragments/footer :: footer">&nbsp;</div>
+</footer>
+
+</body>
+</html>
