@@ -57,7 +57,8 @@ public class SampleController extends AbstractController {
      * @return name of the view
      */
     @RequestMapping(path = "/sample/list", method = {RequestMethod.GET, RequestMethod.POST})
-    public String list(Model model, @ModelAttribute("selectedTenant") SelectedTenant selectedTenant) {
+    public String list(Model model,
+                       @ModelAttribute("selectedTenant") SelectedTenant selectedTenant) {
         LOGGER.debug("Entering sample/list view");
 
         // Set default values
@@ -65,20 +66,79 @@ public class SampleController extends AbstractController {
             selectedTenant.setTenantId("");
         }
 
-        final List<Tenant> tenants = new ArrayList<>();
-        execute(model, () -> tenants.addAll(service.loadTenants()));
-        model.addAttribute("tenants", tenants);
-
-        final List<Sample> samples = new ArrayList<>();
-        execute(model, () -> samples.addAll(service.load(selectedTenant.getTenantId())));
-        model.addAttribute("samples", samples);
+        loadTenants(model);
+        loadSamples(model, selectedTenant);
 
         return "sample/list";
     }
 
+    /**
+     * Create a new sample record and show the edit mask.
+     *
+     * @param model Model for the view
+     * @return name of the view
+     */
+    @PostMapping("/sample/create")
+    public String create(Model model) {
+        LOGGER.info("Create new sample ...");
+
+        loadTenants(model);
+
+        final Sample sample = new Sample();
+        model.addAttribute("sample", sample);
+
+        return "sample/edit";
+    }
+
+    /**
+     * Load an existing sample record and show the edit mask.
+     *
+     * @param model Model for the view
+     * @param uuid  UUID of the {@link Sample}
+     * @return name of the view
+     */
+    @PostMapping("/sample/edit")
+    public String edit(Model model, @ModelAttribute("uuid") String uuid) {
+        LOGGER.info("Edit sample {} ...", uuid);
+
+        loadTenants(model);
+
+        final Sample sample = new Sample();
+        sample.setUuid(uuid);
+        execute(model, () -> service.load(sample));
+        model.addAttribute("sample", sample);
+
+        return "sample/edit";
+    }
+
+    /**
+     * Save a sample record and goto list view
+     *
+     * @param model          Model for the view
+     * @param selectedTenant currently selected tenant
+     * @param sample         Changed sample record
+     * @return name of the view
+     */
+    @PostMapping("/sample/save")
+    public String edit(Model model,
+                       @SessionAttribute("selectedTenant") SelectedTenant selectedTenant,
+                       @ModelAttribute("sample") Sample sample) {
+        LOGGER.info("Save sample {} ...", sample);
+        execute(model, () -> service.save(sample));
+        return list(model, selectedTenant);
+    }
+
+    /**
+     * Delete an existing sample record. Reload the list.
+     *
+     * @param model          Model for the view
+     * @param selectedTenant currently selected tenant
+     * @param uuid           UUID of the {@link Sample}
+     * @return name of the view
+     */
     @PostMapping("/sample/delete")
     public String reset(Model model,
-                        @ModelAttribute("selectedTenant") SelectedTenant selectedTenant,
+                        @SessionAttribute("selectedTenant") SelectedTenant selectedTenant,
                         @ModelAttribute("uuid") String uuid) {
         LOGGER.info("Deleting sample {} ...", uuid);
         execute(model, () -> service.delete(uuid));
@@ -93,13 +153,32 @@ public class SampleController extends AbstractController {
      * @return Success message
      */
     @PostMapping("/sample/reset")
-    public String reset(Model model, @ModelAttribute("selectedTenant") SelectedTenant selectedTenant) {
+    public String reset(Model model,
+                        @SessionAttribute("selectedTenant") SelectedTenant selectedTenant) {
         LOGGER.info("Resetting data ...");
         execute(model, service::reset);
         return list(model, selectedTenant);
     }
 
     // Internals
+
+    /**
+     * Load all tenants in the model.
+     */
+    private void loadTenants(Model model) {
+        final List<Tenant> tenants = new ArrayList<>();
+        execute(model, () -> tenants.addAll(service.loadTenants()));
+        model.addAttribute("tenants", tenants);
+    }
+
+    /**
+     * Load the samples for the selected tenant.
+     */
+    private void loadSamples(Model model, SelectedTenant selectedTenant) {
+        final List<Sample> samples = new ArrayList<>();
+        execute(model, () -> samples.addAll(service.load(selectedTenant.getTenantId())));
+        model.addAttribute("samples", samples);
+    }
 
     /**
      * This is a internal class for storing the selected tenantId.

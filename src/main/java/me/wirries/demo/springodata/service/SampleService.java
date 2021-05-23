@@ -1,5 +1,6 @@
 package me.wirries.demo.springodata.service;
 
+import com.github.dozermapper.core.Mapper;
 import me.wirries.demo.springodata.config.DataConfig;
 import me.wirries.demo.springodata.model.Sample;
 import me.wirries.demo.springodata.model.Tenant;
@@ -11,8 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * This is the business service for the {@link Sample} objects.
@@ -26,25 +26,43 @@ public class SampleService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SampleService.class);
 
+    private final Mapper mapper;
+
     private final DataConfig dataConfig;
 
     private final SampleRepository sampleRepository;
     private final TenantRepository tenantRepository;
 
     @Autowired
-    public SampleService(DataConfig dataConfig, SampleRepository sampleRepository, TenantRepository tenantRepository) {
+    public SampleService(Mapper mapper,
+                         DataConfig dataConfig,
+                         SampleRepository sampleRepository,
+                         TenantRepository tenantRepository) {
+
+        this.mapper = mapper;
         this.dataConfig = dataConfig;
         this.sampleRepository = sampleRepository;
         this.tenantRepository = tenantRepository;
     }
 
+    /**
+     * Load all tenants.
+     *
+     * @return List with {@link Tenant}s
+     */
     public List<Tenant> loadTenants() {
         // TODO Filter by user tenants
         List<Tenant> list = new ArrayList<>();
         tenantRepository.findAll().forEach(list::add);
-        return list;
+        return Collections.unmodifiableList(list);
     }
 
+    /**
+     * Load all samples for the given tenantId.
+     *
+     * @param tenantId Tenant ID
+     * @return List with {@link Sample}s
+     */
     public List<Sample> load(String tenantId) {
         // TODO Filter by user tenants
         List<Sample> list = new ArrayList<>();
@@ -55,9 +73,58 @@ public class SampleService {
             list.addAll(sampleRepository.findAllByTenantTenantId(tenantId));
         }
 
-        return list;
+        return Collections.unmodifiableList(list);
     }
 
+    /**
+     * Load a Sample by UUID from the database and return the detached object.
+     *
+     * @param sample {@link Sample} for update from database
+     * @throws Exception Exception during loading
+     */
+    public void load(Sample sample) throws Exception {
+        LOGGER.debug("Load sample {}", sample);
+
+        // Check if reference to entity exists
+        if (sample == null || StringUtils.isBlank(sample.getUuid())) {
+            return;
+        }
+
+        // Load from database
+        final Optional<Sample> savedSample = sampleRepository.findById(sample.getUuid());
+        if (savedSample.isEmpty()) {
+            throw new Exception("Sample with uuid " + sample.getUuid() + " not exists");
+        }
+
+        // Copy values (detach)
+        mapper.map(savedSample.get(), sample);
+    }
+
+    /**
+     * Save the given sample to database.
+     *
+     * @param sample Sample
+     */
+    public void save(Sample sample) {
+        LOGGER.debug("Saving sample {}", sample);
+
+        // Update with saved values
+        if (StringUtils.isNotBlank(sample.getUuid())) { // TODO refactor to generic solution
+            final Optional<Sample> savedSample = sampleRepository.findById(sample.getUuid());
+            savedSample.ifPresent((e) -> {
+                sample.setCreatedAt(e.getCreatedAt());
+                sample.setCreatedBy(e.getCreatedBy());
+            });
+        }
+
+        sampleRepository.save(sample);
+    }
+
+    /**
+     * Delete the sample with the given uuid.
+     *
+     * @param uuid {@link UUID}
+     */
     public void delete(String uuid) {
         LOGGER.debug("Delete samples {}", uuid);
         sampleRepository.deleteById(uuid);
@@ -76,7 +143,5 @@ public class SampleService {
         LOGGER.debug("Count after setup: " + sampleRepository.count());
         LOGGER.info("Data reset complete.");
     }
-
-    // TODO Implement functions
 
 }

@@ -3,6 +3,7 @@ package me.wirries.demo.springodata.model;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,6 +33,7 @@ public class Sample extends AbstractTenantAdwareEntity {
     @Getter
     @Setter
     @Column(name = "COL_DATE")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private Date colDate;
 
 }

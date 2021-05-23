@@ -6,6 +6,7 @@
 <body>
 
 <!-- Declarations -->
+<!--/*@thymesVar id="selectedTenant" type="me.wirries.demo.springodata.ui.SampleController.SelectedTenant"*/-->
 <!--/*@thymesVar id="tenants" type="java.util.List<me.wirries.demo.springodata.model.Tenant>"*/-->
 <!--/*@thymesVar id="samples" type="java.util.List<me.wirries.demo.springodata.model.Sample>"*/-->
 
@@ -59,6 +60,17 @@
             </div>
         </form>
 
+        <!-- Add new sample -->
+        <div>
+            <div class="float-end">
+                <form action="#" method="post" th:action="@{/sample/create}">
+                    <button class="btn btn-link" type="submit">
+                        <i class="fas fa-plus text-primary"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
         <!-- Current data table -->
         <table class="table align-middle">
             <thead>
@@ -68,12 +80,14 @@
                 <th scope="col">String</th>
                 <th scope="col">Int</th>
                 <th scope="col">Date</th>
-                <th scope="col"></th>
+                <th scope="col">Created</th>
+                <th scope="col">Updated</th>
+                <th scope="col">Actions</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${samples.size() == 0}">
-                <td colspan="6">
+                <td colspan="8">
                     <div class="fw-bolder text-center">No data found</div>
                 </td>
             </tr>
@@ -82,14 +96,33 @@
                 <td th:text="${sample.tenant?.name}">&nbsp;</td>
                 <td th:text="${sample.colString}">&nbsp;</td>
                 <td th:text="${sample.colInt}">&nbsp;</td>
-                <td th:text="${#dates.format(sample.colDate, 'dd.MM.yyyy HH:mm:ss')}">&nbsp;</td>
+                <td th:text="${#dates.format(sample.colDate, 'dd.MM.yy HH:mm:ss')}">&nbsp;</td>
                 <td>
-                    <form action="#" method="post" th:action="@{/sample/delete}">
-                        <input type="hidden" name="uuid" th:value="${sample.uuid}"/>
-                        <button class="btn btn-link btn-sm" type="submit">
-                            <i class="fas fa-trash text-danger"></i>
-                        </button>
-                    </form>
+                    <div th:text="${#dates.format(sample.createdAt, 'dd.MM.yy HH:mm:ss')}">&nbsp;</div>
+                    <div th:text="${sample.createdBy}">&nbsp;</div>
+                </td>
+                <td>
+                    <div th:text="${#dates.format(sample.updatedAt, 'dd.MM.yy HH:mm:ss')}">&nbsp;</div>
+                    <div th:text="${sample.updatedBy}">&nbsp;</div>
+                </td>
+                <!-- Actions -->
+                <td>
+                    <div class="float-start">
+                        <form action="#" method="post" th:action="@{/sample/edit}">
+                            <input type="hidden" name="uuid" th:value="${sample.uuid}"/>
+                            <button class="btn btn-link btn-sm" type="submit">
+                                <i class="fas fa-edit text-success"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="float-start">
+                        <form action="#" method="post" th:action="@{/sample/delete}">
+                            <input type="hidden" name="uuid" th:value="${sample.uuid}"/>
+                            <button class="btn btn-link btn-sm" type="submit">
+                                <i class="fas fa-trash text-danger"></i>
+                            </button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             </tbody>

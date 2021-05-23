@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Spring Boot ODATA - Sample</title>
+</head>
+<body>
+
+<!-- Declarations -->
+<!--/*@thymesVar id="selectedTenant" type="me.wirries.demo.springodata.ui.SampleController.SelectedTenant"*/-->
+<!--/*@thymesVar id="tenants" type="java.util.List<me.wirries.demo.springodata.model.Tenant>"*/-->
+<!--/*@thymesVar id="sample" type="me.wirries.demo.springodata.model.Sample"*/-->
+
+<section>
+    <!-- Form for edit a sample -->
+    <div class="row pb-3 mb-5 border-bottom">
+        <a id="edit"><h3>Edit a sample</h3></a>
+
+        <form action="#" method="post" th:action="@{/sample/save}" th:object="${sample}">
+
+            <div class="mb-3">
+                <input id="uuid" class="form-control" type="hidden" th:field="*{uuid}">
+
+                <label class="form-label" for="tenantId">Tenant</label>
+                <select id="tenantId" class="form-select" aria-describedby="tenantIdHelp" th:field="*{tenant.uuid}">
+                    <option th:each="tenant: ${tenants}" th:value="${tenant.uuid}" th:text="${tenant.name}">&nbsp;
+                    </option>
+                </select>
+                <div id="tenantIdHelp" class="form-text">Select a tenant for the sample.</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="colString">String</label>
+                <input id="colString" class="form-control" type="text" aria-describedby="colStringHelp"
+                       th:field="*{colString}">
+                <div id="colStringHelp" class="form-text">A string value in the sample record.</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="colInt">Int</label>
+                <input id="colInt" class="form-control" type="number" aria-describedby="colIntHelp"
+                       th:field="*{colInt}">
+                <div id="colIntHelp" class="form-text">A int value in the sample record.</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="colDate">Date</label>
+                <input id="colDate" class="form-control" type="datetime-local" step="1" aria-describedby="colDateHelp"
+                       th:field="*{colDate}">
+                <div id="colDateHelp" class="form-text">A date value in the sample record.</div>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Save</button>
+        </form>
+    </div>
+</section>
+</body>
+</html>
