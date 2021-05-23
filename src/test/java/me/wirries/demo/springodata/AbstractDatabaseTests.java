@@ -63,6 +63,7 @@ public abstract class AbstractDatabaseTests extends AbstractApplicationTests {
             store(sample);
         }
         assertEquals(sampleCount, count(Sample.class));
+        flush();
     }
 
     protected void removeAndCheck(Class<?> clazz) {
