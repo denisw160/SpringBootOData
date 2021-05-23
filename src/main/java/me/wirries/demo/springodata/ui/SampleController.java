@@ -62,6 +62,7 @@ public class SampleController {
         repository.findAll().forEach(list::add);
 
         model.addAttribute("samples", list);
+//        model.addAttribute("errorMessage", "testvhvhbjbjkbjkbkj nklnfklewngkjlwenknewlkb jknlkjl");
 
         return "sample/list";
     }

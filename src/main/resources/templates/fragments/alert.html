@@ -1,14 +1,21 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <link href="../../../resources/css/bootstrap.min.css" rel="stylesheet" media="screen"
-          th:href="@{/resources/css/bootstrap.min.css}"/>
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
-<div th:fragment="alert (type, message)" th:assert="${!#strings.isEmpty(type) and !#strings.isEmpty(message)}"
-     class="alert alert-dismissable" th:classappend="'alert-' + ${type}">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <span th:text="${message}">Test</span>
+
+<!-- Declarations -->
+<!--/*@thymesVar id="errorMessage" type="java.lang.String"*/-->
+
+<div class="alert alert-warning alert-dismissible fade show my-3" role="alert" th:fragment="alert">
+    <div class="d-flex justify-content-start align-items-center">
+        <i class="fas fa-exclamation-triangle me-3"></i>
+        <div th:text="${errorMessage}">
+            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+            dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
+            clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+        </div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
+
 </body>
 </html>
