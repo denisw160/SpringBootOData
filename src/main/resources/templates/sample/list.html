@@ -60,7 +60,7 @@
         </form>
 
         <!-- Current data table -->
-        <table class="table">
+        <table class="table align-middle">
             <thead>
             <tr>
                 <th scope="col">#</th>
@@ -68,11 +68,14 @@
                 <th scope="col">String</th>
                 <th scope="col">Int</th>
                 <th scope="col">Date</th>
+                <th scope="col"></th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${samples.size() == 0}">
-                <td colspan="5">No data found</td>
+                <td colspan="6">
+                    <div class="fw-bolder text-center">No data found</div>
+                </td>
             </tr>
             <tr th:each="sample, status: ${samples}">
                 <th scope="row" th:text="${status.index+1}">&nbsp;</th>
@@ -80,6 +83,14 @@
                 <td th:text="${sample.colString}">&nbsp;</td>
                 <td th:text="${sample.colInt}">&nbsp;</td>
                 <td th:text="${#dates.format(sample.colDate, 'dd.MM.yyyy HH:mm:ss')}">&nbsp;</td>
+                <td>
+                    <form action="#" method="post" th:action="@{/sample/delete}">
+                        <input type="hidden" name="uuid" th:value="${sample.uuid}"/>
+                        <button class="btn btn-link btn-sm" type="submit">
+                            <i class="fas fa-trash text-danger"></i>
+                        </button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>

@@ -16,8 +16,8 @@ import javax.persistence.MappedSuperclass;
  * @version 1.0
  * @since 22.05.2021
  */
-@ToString
 @MappedSuperclass
+@ToString(callSuper = true)
 public abstract class AbstractTenantAdwareEntity extends AbstractEntity {
 
     @Getter

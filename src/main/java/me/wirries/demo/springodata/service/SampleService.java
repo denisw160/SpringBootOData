@@ -58,6 +58,12 @@ public class SampleService {
         return list;
     }
 
+    public void delete(String uuid) {
+        LOGGER.debug("Delete samples {}", uuid);
+        sampleRepository.deleteById(uuid);
+        LOGGER.debug("Count after deletion: " + sampleRepository.count());
+    }
+
     /**
      * Resetting the sample data.
      */

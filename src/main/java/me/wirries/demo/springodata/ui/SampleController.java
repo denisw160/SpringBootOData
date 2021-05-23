@@ -76,6 +76,15 @@ public class SampleController extends AbstractController {
         return "sample/list";
     }
 
+    @PostMapping("/sample/delete")
+    public String reset(Model model,
+                        @ModelAttribute("selectedTenant") SelectedTenant selectedTenant,
+                        @ModelAttribute("uuid") String uuid) {
+        LOGGER.info("Deleting sample {} ...", uuid);
+        execute(model, () -> service.delete(uuid));
+        return list(model, selectedTenant);
+    }
+
     /**
      * Delete the existing data and generate 25 new sample records.
      *
