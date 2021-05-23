@@ -23,4 +23,14 @@ public class HomeController {
         return "redirect:/sample/list";
     }
 
+    /**
+     * Redirect to the favicon.
+     *
+     * @return Redirect
+     */
+    @GetMapping("/favicon.ico")
+    public String favicon() {
+        return "redirect:/resources/images/favicon.ico";
+    }
+
 }

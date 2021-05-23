@@ -68,6 +68,17 @@ class SampleRepositoryTest extends AbstractDatabaseTests {
     }
 
     @Test
+    void findAllByTenantTenantId() {
+        final List<Sample> unknown = repository.findAllByTenantTenantId("Unknown");
+        assertNotNull(unknown);
+        assertEquals(0, unknown.size());
+
+        final List<Sample> tenantId1 = repository.findAllByTenantTenantId("TenantId-1");
+        assertNotNull(tenantId1);
+        assertEquals(20, tenantId1.size());
+    }
+
+    @Test
     void findAllByColString() {
         List<Sample> list = repository.findAllByColString("String-99");
         assertNotNull(list);

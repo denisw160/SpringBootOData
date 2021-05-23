@@ -1,19 +1,16 @@
 package me.wirries.demo.springodata.ui;
 
-import me.wirries.demo.springodata.config.DataConfig;
 import me.wirries.demo.springodata.model.Sample;
-import me.wirries.demo.springodata.repo.SampleRepository;
+import me.wirries.demo.springodata.model.Tenant;
 import me.wirries.demo.springodata.service.SampleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,43 +23,55 @@ import java.util.List;
  * @since 22.05.2021
  */
 @Controller
-public class SampleController {
+@SessionAttributes("selectedTenant")
+public class SampleController extends AbstractController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SampleController.class);
 
-    private static final String VIEW_NAME = "sample";
-
-    private final DataConfig dataConfig;
+    // Spring dependencies
     private final SampleService service;
-    private final SampleRepository repository;
 
     @Autowired
-    public SampleController(DataConfig dataConfig, SampleService service, SampleRepository repository) {
-        this.dataConfig = dataConfig;
+    public SampleController(SampleService service) {
         this.service = service;
-        this.repository = repository;
     }
 
-    @ModelAttribute("module")
+    // Model- and session attributes
+    @Override
     public String module() {
         return "sample";
     }
 
+    @ModelAttribute("selectedTenant")
+    public SelectedTenant selectedTenant() {
+        return new SelectedTenant();
+    }
+
+    // Request methods
+
     /**
      * Open the start page.
      *
-     * @param model Model for the view
+     * @param model          Model for the view
+     * @param selectedTenant currently selected tenant or updated
      * @return name of the view
      */
-    @GetMapping("/sample/list")
-    public String list(Model model) {
+    @RequestMapping(path = "/sample/list", method = {RequestMethod.GET, RequestMethod.POST})
+    public String list(Model model, @ModelAttribute("selectedTenant") SelectedTenant selectedTenant) {
         LOGGER.debug("Entering sample/list view");
 
-        final List<Sample> list = new ArrayList<>();
-        repository.findAll().forEach(list::add);
+        // Set default values
+        if (selectedTenant.getTenantId() == null) {
+            selectedTenant.setTenantId("");
+        }
 
-        model.addAttribute("samples", list);
-//        model.addAttribute("errorMessage", "testvhvhbjbjkbjkbkj nklnfklewngkjlwenknewlkb jknlkjl");
+        final List<Tenant> tenants = new ArrayList<>();
+        execute(model, () -> tenants.addAll(service.loadTenants()));
+        model.addAttribute("tenants", tenants);
+
+        final List<Sample> samples = new ArrayList<>();
+        execute(model, () -> samples.addAll(service.load(selectedTenant.getTenantId())));
+        model.addAttribute("samples", samples);
 
         return "sample/list";
     }
@@ -70,21 +79,32 @@ public class SampleController {
     /**
      * Delete the existing data and generate 25 new sample records.
      *
+     * @param model          Model for the view
+     * @param selectedTenant currently selected tenant
      * @return Success message
      */
     @PostMapping("/sample/reset")
-    @ResponseBody
-    public String reset() {
+    public String reset(Model model, @ModelAttribute("selectedTenant") SelectedTenant selectedTenant) {
         LOGGER.info("Resetting data ...");
+        execute(model, service::reset);
+        return list(model, selectedTenant);
+    }
 
-        repository.deleteAll();
-        LOGGER.debug("Count after deletion: " + repository.count());
+    // Internals
 
-        dataConfig.setup();
-        LOGGER.debug("Count after setup: " + repository.count());
+    /**
+     * This is a internal class for storing the selected tenantId.
+     */
+    private static class SelectedTenant implements Serializable {
+        private String tenantId;
 
-        LOGGER.info("Data reset complete.");
-        return "Data reset complete";
+        public String getTenantId() {
+            return tenantId;
+        }
+
+        public void setTenantId(String tenantId) {
+            this.tenantId = tenantId;
+        }
     }
 
 }

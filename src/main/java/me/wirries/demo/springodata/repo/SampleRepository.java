@@ -17,7 +17,15 @@ import java.util.List;
 public interface SampleRepository extends CrudRepository<Sample, String> {
 
     /**
-     * Find all {@link Sample} by the given colUnique value.
+     * Find all {@link Sample}s for the given tenantId.
+     *
+     * @param tenantId ID of the tenant
+     * @return List of matching {@link Sample}s
+     */
+    List<Sample> findAllByTenantTenantId(String tenantId);
+
+    /**
+     * Find all {@link Sample}s by the given colUnique value.
      *
      * @param colString colUnique
      * @return List of matching {@link Sample}s

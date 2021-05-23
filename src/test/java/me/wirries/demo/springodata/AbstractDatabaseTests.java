@@ -1,6 +1,9 @@
 package me.wirries.demo.springodata;
 
+import me.wirries.demo.springodata.model.Role;
 import me.wirries.demo.springodata.model.Sample;
+import me.wirries.demo.springodata.model.Tenant;
+import me.wirries.demo.springodata.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,21 +36,38 @@ public abstract class AbstractDatabaseTests extends AbstractApplicationTests {
      */
     protected void createTestData() {
         // Clean database
-        remove(Sample.class);
-        assertEquals(0, count(Sample.class));
+        removeAndCheck(User.class);
+        removeAndCheck(Role.class);
+        removeAndCheck(Tenant.class);
+        removeAndCheck(Sample.class);
 
-        // Build test data
-        for (int i = 0; i < 100; i++) {
+        // Build tenant data
+        final int tenantCount = 5;
+        for (int i = 0; i < tenantCount; i++) {
+            Tenant tenant = new Tenant();
+            tenant.setTenantId("TenantId-" + i);
+            tenant.setName("Tenant-" + i);
+            store(tenant);
+        }
+        assertEquals(tenantCount, count(Tenant.class));
+        final List<Tenant> tenants = list(Tenant.class);
+
+        // Build sample data
+        final int sampleCount = 100;
+        for (int i = 0; i < sampleCount; i++) {
             Sample sample = new Sample();
             sample.setColString("String-" + i);
             sample.setColInt(i);
             sample.setColDate(getDateBefore(i));
+            sample.setTenant(tenants.get(i % tenantCount));
             store(sample);
         }
-        flush();
+        assertEquals(sampleCount, count(Sample.class));
+    }
 
-        // Ensure data exists
-        assertEquals(100, count(Sample.class));
+    protected void removeAndCheck(Class<?> clazz) {
+        remove(clazz);
+        assertEquals(0, count(clazz));
     }
 
     /**
