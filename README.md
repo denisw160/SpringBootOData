@@ -1,6 +1,7 @@
 # SpringBootOData
 
 [![Maven Build](https://github.com/denisw160/SpringBootOData/actions/workflows/maven.yml/badge.svg)](https://github.com/denisw160/SpringBootOData/actions/workflows/maven.yml)
+[![CodeQL](https://github.com/denisw160/SpringBootOData/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/denisw160/SpringBootOData/actions/workflows/codeql-analysis.yml)
 
 This demo project shows you the implementation of ODATA in Spring Boot with Spring Data (JPA) and Spring Security.
 
