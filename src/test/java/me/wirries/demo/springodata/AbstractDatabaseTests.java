@@ -36,10 +36,10 @@ public abstract class AbstractDatabaseTests extends AbstractApplicationTests {
      */
     protected void createTestData() {
         // Clean database
+        removeAndCheck(Sample.class);
         removeAndCheck(User.class);
         removeAndCheck(Role.class);
         removeAndCheck(Tenant.class);
-        removeAndCheck(Sample.class);
 
         // Build tenant data
         final int tenantCount = 5;
