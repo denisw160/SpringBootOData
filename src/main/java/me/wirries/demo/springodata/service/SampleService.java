@@ -3,6 +3,7 @@ package me.wirries.demo.springodata.service;
 import com.github.dozermapper.core.Mapper;
 import me.wirries.demo.springodata.config.DataConfig;
 import me.wirries.demo.springodata.model.Sample;
+import me.wirries.demo.springodata.model.SampleDto;
 import me.wirries.demo.springodata.model.Tenant;
 import me.wirries.demo.springodata.repo.SampleRepository;
 import me.wirries.demo.springodata.repo.TenantRepository;
@@ -79,10 +80,10 @@ public class SampleService {
     /**
      * Load a Sample by UUID from the database and return the detached object.
      *
-     * @param sample {@link Sample} for update from database
+     * @param sample {@link SampleDto} for update from database
      * @throws Exception Exception during loading
      */
-    public void load(Sample sample) throws Exception {
+    public void load(SampleDto sample) throws Exception {
         LOGGER.debug("Load sample {}", sample);
 
         // Check if reference to entity exists
@@ -105,19 +106,20 @@ public class SampleService {
      *
      * @param sample Sample
      */
-    public void save(Sample sample) {
+    public void save(SampleDto sample) {
         LOGGER.debug("Saving sample {}", sample);
 
         // Update with saved values
-        if (StringUtils.isNotBlank(sample.getUuid())) { // TODO refactor to generic solution
-            final Optional<Sample> savedSample = sampleRepository.findById(sample.getUuid());
-            savedSample.ifPresent((e) -> {
-                sample.setCreatedAt(e.getCreatedAt());
-                sample.setCreatedBy(e.getCreatedBy());
-            });
+        Optional<Sample> savedSample = sampleRepository.findById(sample.getUuid());
+        if (savedSample.isPresent()) {
+            Sample newSample = mapper.map(savedSample.get(), Sample.class);
+            mapper.map(sample, newSample);
+            sampleRepository.save(newSample);
+        } else {
+            // Map to new entity and save
+            Sample newSample = mapper.map(sample, Sample.class);
+            sampleRepository.save(newSample);
         }
-
-        sampleRepository.save(sample);
     }
 
     /**

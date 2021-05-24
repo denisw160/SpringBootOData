@@ -1,6 +1,7 @@
 package me.wirries.demo.springodata.ui;
 
 import me.wirries.demo.springodata.model.Sample;
+import me.wirries.demo.springodata.model.SampleDto;
 import me.wirries.demo.springodata.model.Tenant;
 import me.wirries.demo.springodata.service.SampleService;
 import org.slf4j.Logger;
@@ -103,7 +104,7 @@ public class SampleController extends AbstractController {
 
         loadTenants(model);
 
-        final Sample sample = new Sample();
+        final SampleDto sample = new SampleDto();
         sample.setUuid(uuid);
         execute(model, () -> service.load(sample));
         model.addAttribute("sample", sample);
@@ -122,7 +123,7 @@ public class SampleController extends AbstractController {
     @PostMapping("/sample/save")
     public String edit(Model model,
                        @SessionAttribute("selectedTenant") SelectedTenant selectedTenant,
-                       @ModelAttribute("sample") Sample sample) {
+                       @ModelAttribute("sample") SampleDto sample) {
         LOGGER.info("Save sample {} ...", sample);
         execute(model, () -> service.save(sample));
         return list(model, selectedTenant);
